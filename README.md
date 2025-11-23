@@ -106,8 +106,9 @@ open build/reports/cucumber-report.html
 
 ## 👨‍💻 Author
 
+**Mohammed Gaffar**  
 **Senior QA Automation Engineer**  
-20+ years IT experience | TCS | Java, Selenium, Cucumber, TestNG, Jenkins
+15+ years IT experience | TCS | Java, Selenium, Cucumber, TestNG, Jenkins
 
 ---
 
