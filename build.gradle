@@ -1,0 +1,119 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.gexample'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    //code selenium dependency
+   // testImplementation 'org.seleniumhq.selenium:selenium-java:4.35.0'
+ //    implementation 'org.seleniumhq.selenium:selenium-java:4.35.0' // Use the appropriate version
+    //using old as old browser
+    implementation 'org.seleniumhq.selenium:selenium-java:4.27.0'
+
+    // testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.13.4'
+    implementation 'org.apache.poi:poi:5.2.5' // Use the latest stable version
+    implementation 'org.apache.poi:poi-ooxml:5.2.5' // Use the latest stable version
+   // testImplementation platform('org.junit:junit-bom:5.10.0')
+    //testImplementation 'org.junit.jupiter:junit-jupiter'
+    //testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'io.github.bonigarcia:webdrivermanager:5.5.3'
+    implementation 'org.seleniumhq.selenium:selenium-chrome-driver:4.35.0'
+    //firefox
+    implementation 'org.seleniumhq.selenium:selenium-firefox-driver:4.35.0'
+    //cucumber
+    testImplementation 'io.cucumber:cucumber-java:7.19.0'
+    testImplementation 'io.cucumber:cucumber-testng:7.19.0'
+   // testImplementation("io.cucumber:cucumber-junit:7.19.0")
+    testImplementation 'io.cucumber:cucumber-picocontainer:7.19.0'
+    implementation 'org.apache.commons:commons-lang3:3.19.0'
+    // testng
+    //testImplementation 'org.testng:testng:7.10.2'
+   // implementation("org.testng:testng:7.10.2")
+    implementation 'org.testng:testng:7.10.2'
+    // Add SLF4J implementation to fix the warning
+    testImplementation 'org.slf4j:slf4j-simple:2.0.9'
+    // https://mvnrepository.com/artifact/io.cucumber/cucumber-picocontainer
+
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+test {
+    useTestNG {
+        // Explicitly point to the suite
+        suites file('src/test/resources/testng.xml')
+
+        // Enable verbose output
+        useDefaultListeners = true
+
+        // Configure TestNG programmatically
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+    }
+
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+        showStandardStreams = true
+        exceptionFormat = 'full'
+
+        // Log each test that runs
+        afterSuite { desc, result ->
+            if (!desc.parent) {
+                println "\n--- Test Results ---"
+                println "Tests run: ${result.testCount}"
+                println "Passed: ${result.successfulTestCount}"
+                println "Failed: ${result.failedTestCount}"
+                println "Skipped: ${result.skippedTestCount}"
+            }
+        }
+    }
+
+    // Cucumber configuration
+    systemProperty 'cucumber.plugin', 'pretty, html:build/reports/cucumber-report.html, json:build/reports/cucumber.json'
+
+    // Show more details
+    beforeTest { descriptor ->
+        logger.lifecycle("Running test: ${descriptor}")
+    }
+
+    afterTest { descriptor, result ->
+        logger.lifecycle("Test result: ${result.resultType}")
+    }
+
+    // Force tests to always run
+    outputs.upToDateWhen { false }
+}
+
+
+
+
+// Custom task to run Cucumber tests via MainRunner
+tasks.register ('runCucumberTests', Test) {
+    group = 'verification'
+    description = 'Run Cucumber tests via MainRunner'
+
+    useTestNG() {
+        suites file('src/test/resources/testng.xml')
+    }
+
+    testLogging {
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+        showStandardStreams = true
+        exceptionFormat = 'full'
+    }
+
+    // Show test output in console
+    outputs.upToDateWhen { false }
+}
+
